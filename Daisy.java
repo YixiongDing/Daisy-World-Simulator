@@ -1,8 +1,8 @@
 public class Daisy {
     private int age;
-    private double albedo;
+    private float albedo;
 
-    public Daisy(int age, double albedo){
+    public Daisy(int age, float albedo){
         this.age = age;
         this.albedo = albedo;
     }
@@ -11,7 +11,7 @@ public class Daisy {
         this.age = age;
     }
 
-    public void updateAlbedo(double albedo){
+    public void updateAlbedo(float albedo){
         this.albedo = albedo;
     }
 
@@ -19,7 +19,7 @@ public class Daisy {
         return this.age;
     }
 
-    public double getAlbedo(){
+    public float getAlbedo(){
        return this.albedo;
     }
 }
