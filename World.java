@@ -7,7 +7,7 @@ import java.util.Set;
 public class World {
 	private HashMap<Coordinate, Patch> patchMap;
 	
-	private int globalTemp;
+	private float globalTemp;
 	private int whitePop;
 	private int blackPop;
 	private int totalPop;
@@ -54,6 +54,7 @@ public class World {
 				new_x = rand.nextInt(xSize);
 				new_y = rand.nextInt(ySize);
 			}
+			//System.out.println(patchMap.containsKey(new Coordinate(new_x, new_y)));
 			patchMap.get(new Coordinate(new_x, new_y)).putDaisy(1, rand.nextInt(Parameters.DAISY_LIFE_EXPECTANCY));	
 			usedCoor.add(new Coordinate(new_x, new_y));
 		}
@@ -124,12 +125,13 @@ public class World {
 					}
 				}
 			}
+			if (emptyPatch.size() != 0) {
+				int reproduce_index = rand.nextInt(emptyPatch.size());
+				float reproduce_prob = rand.nextFloat();
 			
-			int reproduce_index = rand.nextInt(emptyPatch.size());
-			float reproduce_prob = rand.nextFloat();
-			
-			if (patch.getSeedThreshold() >= reproduce_prob) {
-				emptyPatch.get(reproduce_index).putDaisy(patchType, 0);
+				if (patch.getSeedThreshold() >= reproduce_prob) {
+					emptyPatch.get(reproduce_index).putDaisy(patchType, 0);
+				}
 			}
 			
 		}
@@ -143,6 +145,8 @@ public class World {
 		
 		for (Coordinate coor : patchMap.keySet()) {
 			patchMap.get(coor).updateLocalTemp();
+			patchMap.get(coor).updateAge();
+			
 		}
 		
 		for (Coordinate coor : patchMap.keySet()) {
@@ -154,20 +158,27 @@ public class World {
 		for (Coordinate coor : patchMap.keySet()) {
 			Patch patch = patchMap.get(coor);
 			float temp = patch.getTemp();
+			
 			globalTemp += temp / worldSize;
 			int type = patch.getType();
 			if (type == 1) {
 				whitePop += 1;
+				totalPop += 1;
 			}else if (type == 2) {
 				blackPop += 1;
+				totalPop += 1;
 			}
 		}
 		
 	}
 	
 	public void renderTick() {
-		String status = String.format("Luminosity: %f, Temp: %f, Population: %d ", luminosity, globalTemp);	
-		System.out.println(status);
+		// String status = String.format("Luminosity: %f, Temp: %f, Population: %d ", luminosity, globalTemp, totalPop);	
+		System.out.println(globalTemp);
+		System.out.println(totalPop);
+		System.out.println(whitePop);
+		System.out.println(blackPop);
+		System.out.println(" ");
 	}
 	
 	public static void main(String[] args) {

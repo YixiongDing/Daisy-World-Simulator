@@ -25,7 +25,7 @@ public class Parameters {
 
 	public static int WORLD_SIZE_Y = 50;
 
-	public static int ROUNDS = 600;
+	public static int ROUNDS = 6000;
 
 
 }

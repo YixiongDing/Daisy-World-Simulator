@@ -1,4 +1,4 @@
-import java.security.KeyStore;
+
 
 public class Patch{
     private float temp;
@@ -8,7 +8,7 @@ public class Patch{
     private int patchType;
     private Daisy currentDaisy;
 
-    private double absorbLumin;
+    private float absorbLumin;
 
     public Patch(){
 
@@ -40,6 +40,7 @@ public class Patch{
     }
     //public put daisy
     public void putDaisy(int type, int age){
+    	this.patchType = type;
         if (type == 0){
             this.currentDaisy = null;
         }
@@ -75,19 +76,20 @@ public class Patch{
     // ****Other Class Methods to interact with world****
 
     public boolean checkDaisyDead(){
-        if(this.currentDaisy.getAge() <= 0){
+        if(this.currentDaisy != null && this.currentDaisy.getAge() >= Parameters.DAISY_LIFE_EXPECTANCY){
             this.currentDaisy = null;
+            this.patchType = 0;
             return true;
         }
         return false;
     }
-    public float calAbosrbLumin(){
-        float absorbLumin = (1 - getAlbedo()) * Parameters.LUMINOSITY;
-        return absorbLumin;
+    public void calAbosrbLumin(){
+        this.absorbLumin = (1 - getAlbedo()) * Parameters.LUMINOSITY;
     }
     public void updateLocalTemp(){
-        if(absorbLumin > 0){
-            this.temp = (float)(Math.log(calAbosrbLumin()) * 72 + 80);
+    	this.calAbosrbLumin();
+        if(this.absorbLumin > 0){
+            this.temp = (float)(Math.log(this.absorbLumin) * 72 + 80);
         }
         else{
             this.temp = 80;
@@ -104,4 +106,10 @@ public class Patch{
         }
         this.temp = newTemp;
     }
+	public void updateAge() {
+		if(this.currentDaisy != null) {
+			int newAge = this.currentDaisy.getAge() + 1;
+			this.currentDaisy.updateAge(newAge);
+		}
+	}
 }
