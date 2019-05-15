@@ -11,7 +11,7 @@ public class Daisy {
         this.age = age;
     }
 
-    public void updateAlbedo(float alberdo){
+    public void updateAlbedo(float albedo){
         this.albedo = albedo;
     }
 
