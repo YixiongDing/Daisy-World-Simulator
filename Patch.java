@@ -88,12 +88,14 @@ public class Patch{
     }
     public void updateLocalTemp(){
     	this.calAbosrbLumin();
+    	float localHeat;
         if(this.absorbLumin > 0){
-            this.temp = (float)(Math.log(this.absorbLumin) * 72 + 80);
+            localHeat = (float)(Math.log(this.absorbLumin) * 72 + 80);
         }
         else{
-            this.temp = 80;
+            localHeat = 80;
         }
+        this.temp = (this.temp + localHeat)/2;
     }
     public void updateTemp(float diffuseTemp, int NeighborNum){
         float curTemp = getTemp() * Parameters.DIFFUSION_RATE;

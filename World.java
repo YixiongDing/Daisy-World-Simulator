@@ -151,8 +151,9 @@ public class World {
 		
 		for (Coordinate coor : patchMap.keySet()) {
 			updateTemp(coor);
-			updateOldDaisy(coor);
 			reproduceDaisy(coor);
+			updateOldDaisy(coor);
+
 		}
 		
 		for (Coordinate coor : patchMap.keySet()) {

@@ -19,13 +19,13 @@ public class Parameters {
 
 	public static float START_BLACK = (float)0.2 ;
 
-	public static int START_TEMP = 0;
+	public static float START_TEMP = (float) 8.8;
 
-	public static int WORLD_SIZE_X = 50;
+	public static int WORLD_SIZE_X = 28;
 
-	public static int WORLD_SIZE_Y = 50;
+	public static int WORLD_SIZE_Y = 28;
 
-	public static int ROUNDS = 6000;
+	public static int ROUNDS = 3000;
 
 
 }
