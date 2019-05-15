@@ -15,6 +15,7 @@ public class Daisy {
         this.albedo = albedo;
     }
 
+
     public int getAge(){
         return this.age;
     }

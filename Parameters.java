@@ -1,35 +1,31 @@
 
 public class Parameters {
-	
-	public static float ALBEDO_WHITE;
-	
-	public static float ALBEDO_BLACK;
-	
-	public static float ALBEO_GROUND;
-	
-	public static float LUMINOSITY;
-	
-	public static float DIFFSION_RATE;
-	
-	public static int SENCERIO;
-	
-	public static int DAISY_LIFE_EXPECTANCY;
-	
-	public static float START_WHITE;
-	
-	public static float START_BLACK;
-	
-	public static int MIN_PRODUCE_TEMP;
-	
-	public static int MAX_PRODUCE_TEMP;
-	
-	public static int START_TEMP;
-	
-	public static int WORLD_SIZE_X;
-	
-	public static int WORLD_SIZE_Y;
-	
-	public static int ROUNDS;
-	
+
+	public static float ALBEDO_WHITE = 0.75;
+
+	public static float ALBEDO_BLACK = 0.25;
+
+	public static float ALBEO_GROUND = 0.4;
+
+	public static float LUMINOSITY = 0.8;
+
+	public static float DIFFUSION_RATE = 0.5 ;
+
+	public static int SENCERIO = 1;
+
+	public static int DAISY_LIFE_EXPECTANCY = 25;
+
+	public static float START_WHITE = 0.2;
+
+	public static float START_BLACK = 0.2 ;
+
+	public static int START_TEMP = 0;
+
+	public static int WORLD_SIZE_X = 50;
+
+	public static int WORLD_SIZE_Y = 50;
+
+	public static int ROUNDS = 600;
+
 
 }
