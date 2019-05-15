@@ -54,7 +54,7 @@ public class World {
 				new_x = rand.nextInt(xSize);
 				new_y = rand.nextInt(ySize);
 			}
-			patchMap.get(new Coordinate(new_x, new_y)).putDaisy(0);	
+			patchMap.get(new Coordinate(new_x, new_y)).putDaisy(1, rand.nextInt(Parameters.DAISY_LIFE_EXPECTANCY));	
 			usedCoor.add(new Coordinate(new_x, new_y));
 		}
 		
@@ -65,7 +65,7 @@ public class World {
 				new_x = rand.nextInt(xSize);
 				new_y = rand.nextInt(ySize);
 			}
-			patchMap.get(new Coordinate(new_x, new_y)).putDaisy(1);
+			patchMap.get(new Coordinate(new_x, new_y)).putDaisy(2, rand.nextInt(Parameters.DAISY_LIFE_EXPECTANCY));
 			usedCoor.add(new Coordinate(new_x, new_y));
 		}
 	}
@@ -87,7 +87,7 @@ public class World {
 				Coordinate neighCoor = new Coordinate(i, j);
 				if (patchMap.containsKey(neighCoor)) {
 					neighborNumber += 1;
-					duf += patchMap.get(neighCoor).getTemp() * Parameters.DIFFSION_RATE / 8;
+					duf += patchMap.get(neighCoor).getTemp() * Parameters.DIFFUSION_RATE / 8;
 				}
 			}
 		}
@@ -97,7 +97,7 @@ public class World {
 	}
 	
 	public void updateOldDaisy(Coordinate coor) {
-		patchMap.get(coor).updateOldDaisy();
+		patchMap.get(coor).checkDaisyDead();
 	}
 	
 	public void reproduceDaisy(Coordinate coor) {
@@ -128,8 +128,8 @@ public class World {
 			int reproduce_index = rand.nextInt(emptyPatch.size());
 			float reproduce_prob = rand.nextFloat();
 			
-			if (patch.getReproduceProb() >= reproduce_prob) {
-				emptyPatch.get(reproduce_index).putDaisy(patchType);
+			if (patch.getSeedThreshold() >= reproduce_prob) {
+				emptyPatch.get(reproduce_index).putDaisy(patchType, 0);
 			}
 			
 		}
