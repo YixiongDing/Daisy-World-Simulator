@@ -10,17 +10,16 @@ public class Patch{
 
     private double absorbLumin;
 
-    public Patch(float temp, int x, int y, float gAlbedo, Daisy curDaisy){
+    public Patch(){
+
+    }
+    public Patch(float temp, float gAlbedo, Daisy curDaisy){
         this.temp = temp;
-        this.xAsis = x;
-        this.yAsis = y;
         this.groudAlbedo = gAlbedo;
         this.currentDaisy = curDaisy;
     }
-    public Patch(float temp, int x, int y, float gAlbedo, int type){
+    public Patch(float temp, float gAlbedo, int type){
         this.temp = temp;
-        this.xAsis = x;
-        this.yAsis = y;
         this.groudAlbedo = gAlbedo;
         this.patchType = type;
         setCurrentDaisy();
@@ -39,16 +38,23 @@ public class Patch{
             this.currentDaisy = new BlackDaisy(randomAge, Parameters.ALBEDO_BLACK);
         }
     }
+    //public put daisy
+    public void putDaisy(int type, int age){
+        if (type == 0){
+            this.currentDaisy = null;
+        }
+        else if(type == 1){
+            this.currentDaisy = new WhiteDaisy(age, Parameters.ALBEDO_WHITE);
+        }
+        else if(type == 2){
+            this.currentDaisy = new BlackDaisy(age, Parameters.ALBEDO_BLACK);
+        }
+    }
     //Getter Methods
     public float getTemp(){
         return temp;
     }
-    public int getxAsis(){
-        return xAsis;
-    }
-    public int getyAsis(){
-        return yAsis;
-    }
+    public int getType(){return patchType;}
     public float getAlbedo(){
         if(this.currentDaisy == null){
             return groudAlbedo;
