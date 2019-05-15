@@ -1,18 +1,18 @@
 public class Daisy {
     private int age;
-    private float alberdo;
+    private float albedo;
 
-    public Daisy(int age, float alberdo){
+    public Daisy(int age, float albedo){
         this.age = age;
-        this.alberdo = alberdo;
+        this.albedo = albedo;
     }
 
     public void updateAge(int age){
         this.age = age;
     }
 
-    public void updateAlberdo(float alberdo){
-        this.alberdo = alberdo;
+    public void updateAlbedo(float alberdo){
+        this.albedo = albedo;
     }
 
 
@@ -20,7 +20,7 @@ public class Daisy {
         return this.age;
     }
 
-    public float getAlberdo(){
-       return this.alberdo;
+    public float getAlbedo(){
+       return this.albedo;
     }
 }
