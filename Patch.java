@@ -13,10 +13,8 @@ public class Patch{
     public Patch(){
 
     }
-    public Patch(float temp, float gAlbedo, Daisy curDaisy){
+    public Patch(float temp){
         this.temp = temp;
-        this.groudAlbedo = gAlbedo;
-        this.currentDaisy = curDaisy;
     }
     public Patch(float temp, float gAlbedo, int type){
         this.temp = temp;
@@ -58,7 +56,7 @@ public class Patch{
     public int getType(){return patchType;}
     public float getAlbedo(){
         if(this.currentDaisy == null){
-            return groudAlbedo;
+            return Parameters.ALBEO_GROUND;
         }
         else{
             return this.currentDaisy.getAlbedo();
@@ -87,7 +85,7 @@ public class Patch{
         this.absorbLumin = (1 - getAlbedo()) * Parameters.LUMINOSITY;
     }
     public void updateLocalTemp(){
-    	this.calAbosrbLumin();
+    	calAbosrbLumin();
     	float localHeat;
         if(this.absorbLumin > 0){
             localHeat = (float)(Math.log(this.absorbLumin) * 72 + 80);

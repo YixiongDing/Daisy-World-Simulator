@@ -26,17 +26,14 @@ public class World {
 		xSize = Parameters.WORLD_SIZE_X;
 		ySize = Parameters.WORLD_SIZE_Y;
 		worldSize = xSize * ySize;
-		
-		for (int i = 0; i < xSize; i++) {
-			for (int j = 0; j < ySize; j++) {
-				patchMap.put(new Coordinate(i, j),  new Patch()); 
-			}
-		}
-		
 		globalTemp = Parameters.START_TEMP;
 		luminosity = Parameters.LUMINOSITY;
 		sencerio = Parameters.SENCERIO;
-		
+		for (int i = 0; i < xSize; i++) {
+			for (int j = 0; j < ySize; j++) {
+				patchMap.put(new Coordinate(i, j),  new Patch(globalTemp));
+			}
+		}
 		setupDaisy();
 	}
 	
@@ -153,7 +150,6 @@ public class World {
 			updateTemp(coor);
 			reproduceDaisy(coor);
 			updateOldDaisy(coor);
-
 		}
 		
 		for (Coordinate coor : patchMap.keySet()) {
