@@ -76,6 +76,7 @@ public class Patch{
             localHeat = 80;
         }
         this.preDifTemp = (this.temp + localHeat) / 2;
+        this.temp = preDifTemp;
     }
     public void updateTemp(double diffuseTemp, int NeighborNum){
         double curTemp = getPreDifTemp() * (1 - Parameters.DIFFUSION_RATE);
