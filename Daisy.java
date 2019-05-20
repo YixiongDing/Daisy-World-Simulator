@@ -2,6 +2,13 @@ public class Daisy {
     private int age;
     private float albedo;
 
+    public Daisy(){
+
+    }
+    public Daisy(int age){
+        this.age = age;
+    }
+
     public Daisy(int age, float albedo){
         this.age = age;
         this.albedo = albedo;

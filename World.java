@@ -36,11 +36,13 @@ public class World {
 		}
 		setupDaisy();
 	}
-	
+	// Method without using Dasiy Object
 	public void setupDaisy() {
 		int total_size = worldSize;
 		int startWhite = (int) (total_size * Parameters.START_WHITE);
+		System.out.println(startWhite);
 		int startBlack = (int) (total_size * Parameters.START_BLACK);
+		System.out.println(startBlack);
 		Set<Coordinate> usedCoor = new HashSet<Coordinate>();
 		Random rand = new Random();
 		
@@ -52,7 +54,8 @@ public class World {
 				new_y = rand.nextInt(ySize);
 			}
 			//System.out.println(patchMap.containsKey(new Coordinate(new_x, new_y)));
-			patchMap.get(new Coordinate(new_x, new_y)).putDaisy(1, rand.nextInt(Parameters.DAISY_LIFE_EXPECTANCY));	
+			//patchMap.get(new Coordinate(new_x, new_y)).putDaisy(1, rand.nextInt(Parameters.DAISY_LIFE_EXPECTANCY));
+			patchMap.get(new Coordinate(new_x, new_y)).setCurrentDaisy(new WhiteDaisy());
 			usedCoor.add(new Coordinate(new_x, new_y));
 		}
 		
@@ -63,7 +66,8 @@ public class World {
 				new_x = rand.nextInt(xSize);
 				new_y = rand.nextInt(ySize);
 			}
-			patchMap.get(new Coordinate(new_x, new_y)).putDaisy(2, rand.nextInt(Parameters.DAISY_LIFE_EXPECTANCY));
+			//patchMap.get(new Coordinate(new_x, new_y)).putDaisy(2, rand.nextInt(Parameters.DAISY_LIFE_EXPECTANCY));
+			patchMap.get(new Coordinate(new_x, new_y)).setCurrentDaisy(new BlackDaisy());
 			usedCoor.add(new Coordinate(new_x, new_y));
 		}
 	}
@@ -103,10 +107,11 @@ public class World {
 		ArrayList<Patch> emptyPatch = new ArrayList<Patch>();
 		int x = coor.getX();
 		int y = coor.getY();
-		int patchType;
+		//int patchType;
 		Random rand = new Random();
 		
-		if ((patchType = patch.getType()) != 0) {
+		//if ((patchType = patch.getType()) != 0)
+		if (patch.getCurrentDaisy() != null){
 			
 			for (int i = x - 1; i < x + 2; i++) {
 				for (int j = y - 1; j < y + 2; j++) {
@@ -117,7 +122,7 @@ public class World {
 					
 					Coordinate neighCoor = new Coordinate(i, j);
 					if (patchMap.containsKey(neighCoor) && 
-							(patchMap.get(neighCoor).getType() == 0)) {
+							(patchMap.get(neighCoor).getCurrentDaisy() == null)) {
 						emptyPatch.add(patchMap.get(neighCoor));
 					}
 				}
@@ -127,10 +132,15 @@ public class World {
 				float reproduce_prob = rand.nextFloat();
 			
 				if (patch.getSeedThreshold() >= reproduce_prob) {
-					emptyPatch.get(reproduce_index).putDaisy(patchType, 0);
+					//emptyPatch.get(reproduce_index).putDaisy(patchType, 0);
+					if (patch.getCurrentDaisy() instanceof BlackDaisy) {
+						emptyPatch.get(reproduce_index).setCurrentDaisy(new BlackDaisy(0));
+					}
+					else{
+						emptyPatch.get(reproduce_index).setCurrentDaisy(new WhiteDaisy(0));
+					}
 				}
 			}
-			
 		}
 	}
 	
@@ -157,11 +167,11 @@ public class World {
 			float temp = patch.getTemp();
 			
 			globalTemp += temp / worldSize;
-			int type = patch.getType();
-			if (type == 1) {
+			Daisy type = patch.getCurrentDaisy();
+			if (type instanceof WhiteDaisy) {
 				whitePop += 1;
 				totalPop += 1;
-			}else if (type == 2) {
+			}else if (type instanceof BlackDaisy) {
 				blackPop += 1;
 				totalPop += 1;
 			}

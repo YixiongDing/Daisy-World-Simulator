@@ -5,6 +5,8 @@ public class Parameters {
 
 	public static float ALBEDO_BLACK = (float)0.25;
 
+	public static float ALBEDO_RED = (float)0.5;
+
 	public static float ALBEO_GROUND = (float)0.4;
 
 	public static float LUMINOSITY = (float)0.8;
@@ -25,7 +27,7 @@ public class Parameters {
 
 	public static int WORLD_SIZE_Y = 28;
 
-	public static int ROUNDS = 3000;
+	public static int ROUNDS = 6000;
 
 
 }

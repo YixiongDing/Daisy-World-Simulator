@@ -1,59 +1,42 @@
-
-
 public class Patch{
     private float temp;
-    private int xAsis;
-    private int yAsis;
-    private float groudAlbedo;
-    private int patchType;
     private Daisy currentDaisy;
-
     private float absorbLumin;
 
-    public Patch(){
-
-    }
+    public Patch(){ }
     public Patch(float temp){
         this.temp = temp;
-    }
-    public Patch(float temp, float gAlbedo, int type){
-        this.temp = temp;
-        this.groudAlbedo = gAlbedo;
-        this.patchType = type;
-        setCurrentDaisy();
+        setGround();
     }
     //Setter Methods
-    private void setCurrentDaisy(){
-        if (this.patchType == 0){
-            this.currentDaisy = null;
+    public void setCurrentDaisy(Daisy newDaisy){
+        if(newDaisy instanceof WhiteDaisy){
+            //System.out.println("Setting white daisy");
+            if(newDaisy.getAge() != 0) {
+                int randomAge = (int) (Math.random() * (Parameters.DAISY_LIFE_EXPECTANCY + 1));
+                newDaisy.updateAge(randomAge);
+            }
+            this.currentDaisy = newDaisy;
         }
-        else if(this.patchType == 1){
-            int randomAge = (int)(Math.random() * (Parameters.DAISY_LIFE_EXPECTANCY + 1));
-            this.currentDaisy = new WhiteDaisy(randomAge, Parameters.ALBEDO_WHITE);
-        }
-        else if(this.patchType == 2){
-            int randomAge = (int )(Math.random() * (Parameters.DAISY_LIFE_EXPECTANCY + 1));
-            this.currentDaisy = new BlackDaisy(randomAge, Parameters.ALBEDO_BLACK);
-        }
-    }
-    //public put daisy
-    public void putDaisy(int type, int age){
-    	this.patchType = type;
-        if (type == 0){
-            this.currentDaisy = null;
-        }
-        else if(type == 1){
-            this.currentDaisy = new WhiteDaisy(age, Parameters.ALBEDO_WHITE);
-        }
-        else if(type == 2){
-            this.currentDaisy = new BlackDaisy(age, Parameters.ALBEDO_BLACK);
+        else if(newDaisy instanceof BlackDaisy){
+            //System.out.println("setting black daisy");
+            if(newDaisy.getAge()!=0){
+                int randomAge = (int )(Math.random() * (Parameters.DAISY_LIFE_EXPECTANCY + 1));
+                newDaisy.updateAge(randomAge);
+            }
+            this.currentDaisy = newDaisy;
         }
     }
-    //Getter Methods
+    private void setGround(){
+        this.currentDaisy = null;
+    }
+    /********************************Getter Methods************************************/
     public float getTemp(){
-        return temp;
+        return this.temp;
     }
-    public int getType(){return patchType;}
+    public Daisy getCurrentDaisy(){
+        return this.currentDaisy;
+    }
     public float getAlbedo(){
         if(this.currentDaisy == null){
             return Parameters.ALBEO_GROUND;
@@ -71,12 +54,11 @@ public class Patch{
         }
         return 0;
     }
-    // ****Other Class Methods to interact with world****
+    /****Other Class Methods to interact with world****/
 
     public boolean checkDaisyDead(){
         if(this.currentDaisy != null && this.currentDaisy.getAge() >= Parameters.DAISY_LIFE_EXPECTANCY){
             this.currentDaisy = null;
-            this.patchType = 0;
             return true;
         }
         return false;
