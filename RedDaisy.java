@@ -7,7 +7,7 @@ public class RedDaisy extends Daisy{
         super(age);
         this.updateAlbedo(Parameters.ALBEDO_RED);
     }
-    public RedDaisy(int age, float albedo){
+    public RedDaisy(int age, double albedo){
         super(age, albedo);
     }
 }

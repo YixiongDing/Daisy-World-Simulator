@@ -1,14 +1,14 @@
 public class Patch{
-    private float temp;
+    // Patch Temperature after diffusion
+    private double temp;
+    // Pre Diffusion Temperature
+    private double preDifTemp;
+
     private Daisy currentDaisy;
-    private float absorbLumin;
+    private double absorbLumin;
 
     public Patch(){ }
-    public Patch(float temp){
-        this.temp = temp;
-        setGround();
-    }
-    //Setter Methods
+    /***********************Setter Methods**************************/
     public void setCurrentDaisy(Daisy newDaisy){
         if(newDaisy instanceof WhiteDaisy){
             //System.out.println("Setting white daisy");
@@ -30,62 +30,58 @@ public class Patch{
     private void setGround(){
         this.currentDaisy = null;
     }
+
     /********************************Getter Methods************************************/
-    public float getTemp(){
+    public double getTemp(){
         return this.temp;
+    }
+    public double getPreDifTemp(){
+        return this.preDifTemp;
     }
     public Daisy getCurrentDaisy(){
         return this.currentDaisy;
     }
-    public float getAlbedo(){
+    public double getAlbedo(){
         if(this.currentDaisy == null){
-            return Parameters.ALBEO_GROUND;
+            return Parameters.ALBEDO_GROUND;
         }
         else{
             return this.currentDaisy.getAlbedo();
         }
     }
-    public float getSeedThreshold(){
-        if(this.currentDaisy != null){
-            float curTemp = getTemp();
-            float sqrCurTemp = curTemp * curTemp;
-            float seedThreshold = (float) (curTemp * 0.1457 - (0.0032 * sqrCurTemp) - 0.6443);
-            return seedThreshold;
+    public double getSeedThreshold(){
+        if(this.currentDaisy != null && this.currentDaisy.getAge() < Parameters.DAISY_LIFE_EXPECTANCY){
+            double curTemp = getTemp();
+            return ((curTemp*0.1457) - (0.0032*curTemp*curTemp) - 0.6443);
         }
-        return 0;
+        return 0.0;
     }
     /****Other Class Methods to interact with world****/
 
-    public boolean checkDaisyDead(){
+    public void checkDaisyDead(){
         if(this.currentDaisy != null && this.currentDaisy.getAge() >= Parameters.DAISY_LIFE_EXPECTANCY){
             this.currentDaisy = null;
-            return true;
         }
-        return false;
     }
     public void calAbosrbLumin(){
         this.absorbLumin = (1 - getAlbedo()) * Parameters.LUMINOSITY;
     }
     public void updateLocalTemp(){
     	calAbosrbLumin();
-    	float localHeat;
+    	double localHeat;
         if(this.absorbLumin > 0){
-            localHeat = (float)(Math.log(this.absorbLumin) * 72 + 80);
+            localHeat = (Math.log(this.absorbLumin) * 72) + 80;
         }
         else{
             localHeat = 80;
         }
-        this.temp = (this.temp + localHeat)/2;
+        this.preDifTemp = (this.temp + localHeat) / 2;
     }
-    public void updateTemp(float diffuseTemp, int NeighborNum){
-        float curTemp = getTemp() * Parameters.DIFFUSION_RATE;
-        float newTemp;
-        if (NeighborNum < 8){
-            newTemp = (1 + (8 - NeighborNum) / 8 ) * curTemp + diffuseTemp;
-        }
-        else{
-            newTemp = curTemp + diffuseTemp;
-        }
+    public void updateTemp(double diffuseTemp, int NeighborNum){
+        double curTemp = getPreDifTemp() * (1 - Parameters.DIFFUSION_RATE);
+        double newTemp;
+        newTemp = (1 + (8 - NeighborNum) / 8 ) * curTemp + diffuseTemp;
+        //update patch temperature after diffusion
         this.temp = newTemp;
     }
 	public void updateAge() {

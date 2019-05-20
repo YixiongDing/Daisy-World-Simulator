@@ -7,7 +7,7 @@ import java.util.Set;
 public class World {
 	private HashMap<Coordinate, Patch> patchMap;
 	
-	private float globalTemp;
+	private double globalTemp;
 	private int whitePop;
 	private int blackPop;
 	private int totalPop;
@@ -15,7 +15,7 @@ public class World {
 	private int ySize;
 	private int worldSize;
 	private int sencerio;
-	private float luminosity;
+	private double luminosity;
 	
 	public World() {
 		patchMap = new HashMap<Coordinate, Patch>();
@@ -26,15 +26,19 @@ public class World {
 		xSize = Parameters.WORLD_SIZE_X;
 		ySize = Parameters.WORLD_SIZE_Y;
 		worldSize = xSize * ySize;
-		globalTemp = Parameters.START_TEMP;
+		globalTemp = 0;
 		luminosity = Parameters.LUMINOSITY;
 		sencerio = Parameters.SENCERIO;
 		for (int i = 0; i < xSize; i++) {
 			for (int j = 0; j < ySize; j++) {
-				patchMap.put(new Coordinate(i, j),  new Patch(globalTemp));
+				patchMap.put(new Coordinate(i, j),  new Patch());
 			}
 		}
 		setupDaisy();
+		for (Coordinate coor : patchMap.keySet()) {
+			patchMap.get(coor).updateLocalTemp();
+			//System.out.println( patchMap.get(coor).getAlbedo() + "  " + patchMap.get(coor).getTemp());
+		}
 	}
 	// Method without using Dasiy Object
 	public void setupDaisy() {
@@ -43,9 +47,21 @@ public class World {
 		System.out.println(startWhite);
 		int startBlack = (int) (total_size * Parameters.START_BLACK);
 		System.out.println(startBlack);
+
 		Set<Coordinate> usedCoor = new HashSet<Coordinate>();
+
 		Random rand = new Random();
-		
+		for (int j = 0; j < startBlack; j++) {
+			int new_x = rand.nextInt(xSize);
+			int new_y = rand.nextInt(ySize);
+			while (usedCoor.contains(new Coordinate(new_x, new_y))) {
+				new_x = rand.nextInt(xSize);
+				new_y = rand.nextInt(ySize);
+			}
+			//patchMap.get(new Coordinate(new_x, new_y)).putDaisy(2, rand.nextInt(Parameters.DAISY_LIFE_EXPECTANCY));
+			patchMap.get(new Coordinate(new_x, new_y)).setCurrentDaisy(new BlackDaisy());
+			usedCoor.add(new Coordinate(new_x, new_y));
+		}
 		for (int i = 0; i < startWhite; i++) {
 			int new_x = rand.nextInt(xSize);
 			int new_y = rand.nextInt(ySize);
@@ -58,25 +74,13 @@ public class World {
 			patchMap.get(new Coordinate(new_x, new_y)).setCurrentDaisy(new WhiteDaisy());
 			usedCoor.add(new Coordinate(new_x, new_y));
 		}
-		
-		for (int j = 0; j < startBlack; j++) {
-			int new_x = rand.nextInt(xSize);
-			int new_y = rand.nextInt(ySize);
-			while (usedCoor.contains(new Coordinate(new_x, new_y))) {
-				new_x = rand.nextInt(xSize);
-				new_y = rand.nextInt(ySize);
-			}
-			//patchMap.get(new Coordinate(new_x, new_y)).putDaisy(2, rand.nextInt(Parameters.DAISY_LIFE_EXPECTANCY));
-			patchMap.get(new Coordinate(new_x, new_y)).setCurrentDaisy(new BlackDaisy());
-			usedCoor.add(new Coordinate(new_x, new_y));
-		}
 	}
 	
 	public void updateTemp(Coordinate coor) {
 		
 		int x = coor.getX();
 		int y = coor.getY();
-		float duf = 0;
+		double duf = 0;
 		int neighborNumber = 0;
 			
 		for (int i = x - 1; i < x + 2; i++) {
@@ -89,7 +93,7 @@ public class World {
 				Coordinate neighCoor = new Coordinate(i, j);
 				if (patchMap.containsKey(neighCoor)) {
 					neighborNumber += 1;
-					duf += patchMap.get(neighCoor).getTemp() * Parameters.DIFFUSION_RATE / 8;
+					duf += patchMap.get(neighCoor).getPreDifTemp() * Parameters.DIFFUSION_RATE / 8;
 				}
 			}
 		}
@@ -101,7 +105,7 @@ public class World {
 	public void updateOldDaisy(Coordinate coor) {
 		patchMap.get(coor).checkDaisyDead();
 	}
-	
+	//new flower will not reproduce.
 	public void reproduceDaisy(Coordinate coor) {
 		Patch patch = patchMap.get(coor);
 		ArrayList<Patch> emptyPatch = new ArrayList<Patch>();
@@ -129,9 +133,9 @@ public class World {
 			}
 			if (emptyPatch.size() != 0) {
 				int reproduce_index = rand.nextInt(emptyPatch.size());
-				float reproduce_prob = rand.nextFloat();
+				double reproduce_prob = rand.nextDouble();
 			
-				if (patch.getSeedThreshold() >= reproduce_prob) {
+				if (patch.getSeedThreshold() > reproduce_prob) {
 					//emptyPatch.get(reproduce_index).putDaisy(patchType, 0);
 					if (patch.getCurrentDaisy() instanceof BlackDaisy) {
 						emptyPatch.get(reproduce_index).setCurrentDaisy(new BlackDaisy(0));
@@ -164,7 +168,7 @@ public class World {
 		
 		for (Coordinate coor : patchMap.keySet()) {
 			Patch patch = patchMap.get(coor);
-			float temp = patch.getTemp();
+			double temp = patch.getTemp();
 			
 			globalTemp += temp / worldSize;
 			Daisy type = patch.getCurrentDaisy();

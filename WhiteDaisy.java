@@ -7,7 +7,7 @@ public class WhiteDaisy extends Daisy {
         super(age);
         this.updateAlbedo(Parameters.ALBEDO_WHITE);
     }
-    public WhiteDaisy(int age, float albedo){
+    public WhiteDaisy(int age, double albedo){
         super(age, albedo);
     }
 }
