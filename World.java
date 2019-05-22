@@ -1,11 +1,23 @@
+/**
+ * World class for wrapping all the elements in the experiment.
+ *
+ * @author Shenglan Yu<shenglany1@student.unimelb.edu.au> - 808600
+ * TODO: FILL your name and id
+ *
+ */
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
 public class World {
+	// hash map for all the patchs
 	private HashMap<Coordinate, Patch> patchMap;
+	// csv handler for writing records
+	private CsvHandler csv;
 	
 	private double globalTemp;
 	private int whitePop;
@@ -14,75 +26,157 @@ public class World {
 	private int xSize;
 	private int ySize;
 	private int worldSize;
-	private int sencerio;
-	private double luminosity;
+	private Sencerio sencerio;
+	private int tick;
+	// random generator with seed
+	Random rand;
 	
-	public World() {
+	public World(CsvHandler csv) {
 		patchMap = new HashMap<Coordinate, Patch>();
+		this.csv = csv;
+		this.tick = 0;
+		this.rand = new Random(1234567);
 		setupWorld();
 	}
 	
+	/**
+	 * Initialize the world
+	 */
 	public void setupWorld() {
 		xSize = Parameters.WORLD_SIZE_X;
 		ySize = Parameters.WORLD_SIZE_Y;
 		worldSize = xSize * ySize;
 		globalTemp = 0;
-		luminosity = Parameters.LUMINOSITY;
 		sencerio = Parameters.SENCERIO;
+		
+		// initialize all patches
 		for (int i = 0; i < xSize; i++) {
 			for (int j = 0; j < ySize; j++) {
 				patchMap.put(new Coordinate(i, j),  new Patch());
 			}
 		}
+		
+		// initialize all daisyes
 		setupDaisy();
+		
+		// initialize all patches' temperature and global temperature
+		double totalTemp = 0;
 		for (Coordinate coor : patchMap.keySet()) {
 			patchMap.get(coor).updateLocalTemp();
-			//System.out.println( patchMap.get(coor).getAlbedo() + "  " + patchMap.get(coor).getTemp());
+			totalTemp += patchMap.get(coor).getTemp();
 		}
+		globalTemp = totalTemp / worldSize;
+		
+		updateObservers();
+		renderTick();
+		writeCsv();
+		
 	}
-	// Method without using Dasiy Object
+	
+	/**
+	 * Create a bunch of daisy randomly based on the start population
+	 */
 	public void setupDaisy() {
-		int total_size = worldSize;
-		int startWhite = (int) (total_size * Parameters.START_WHITE);
-		System.out.println(startWhite);
-		int startBlack = (int) (total_size * Parameters.START_BLACK);
-		System.out.println(startBlack);
+		int startWhite = (int) Math.round((worldSize * Parameters.START_WHITE));
+		int startBlack = (int) Math.round((worldSize * Parameters.START_BLACK));
 
 		Set<Coordinate> usedCoor = new HashSet<Coordinate>();
-
-		Random rand = new Random();
+		
+		// create black daisy 
 		for (int j = 0; j < startBlack; j++) {
 			int new_x = rand.nextInt(xSize);
 			int new_y = rand.nextInt(ySize);
+			
+			// ensure daisy are born at different cells
 			while (usedCoor.contains(new Coordinate(new_x, new_y))) {
 				new_x = rand.nextInt(xSize);
 				new_y = rand.nextInt(ySize);
 			}
-			//patchMap.get(new Coordinate(new_x, new_y)).putDaisy(2, rand.nextInt(Parameters.DAISY_LIFE_EXPECTANCY));
-			patchMap.get(new Coordinate(new_x, new_y)).setCurrentDaisy(new BlackDaisy());
+			
+			patchMap.get(new Coordinate(new_x, new_y)).setCurrentDaisy(new BlackDaisy(1));
 			usedCoor.add(new Coordinate(new_x, new_y));
 		}
+		
+		// create white daisy 
 		for (int i = 0; i < startWhite; i++) {
 			int new_x = rand.nextInt(xSize);
 			int new_y = rand.nextInt(ySize);
+			
+			// ensure daisy are born at different cells
 			while (usedCoor.contains(new Coordinate(new_x, new_y))) {
 				new_x = rand.nextInt(xSize);
 				new_y = rand.nextInt(ySize);
 			}
-			//System.out.println(patchMap.containsKey(new Coordinate(new_x, new_y)));
-			//patchMap.get(new Coordinate(new_x, new_y)).putDaisy(1, rand.nextInt(Parameters.DAISY_LIFE_EXPECTANCY));
-			patchMap.get(new Coordinate(new_x, new_y)).setCurrentDaisy(new WhiteDaisy());
+	
+			patchMap.get(new Coordinate(new_x, new_y)).setCurrentDaisy(new WhiteDaisy(1));
 			usedCoor.add(new Coordinate(new_x, new_y));
 		}
 	}
 	
-	public void updateTemp(Coordinate coor) {
-		
+	/**
+	 * Diffuse heat to eight neighbours
+	 * @param patch
+	 */
+	public void diffuseTemperature(Patch clonePatch, Coordinate coor) {
 		int x = coor.getX();
 		int y = coor.getY();
-		double duf = 0;
-		int neighborNumber = 0;
+		double heatForDiffuse = clonePatch.getTemp() * Parameters.DIFFUSION_RATE;
+		double diffuseEachShare = heatForDiffuse / 8;
+		double totalOutHeat = 0;
 			
+		for (int i = x - 1; i < x + 2; i++) {
+			for (int j = y - 1; j < y + 2; j++) {
+	
+				// itself
+				if (i == x && j == y) {
+					continue;
+				}
+				
+				Coordinate neighborCoor = new Coordinate(i, j);
+				if (patchMap.containsKey(neighborCoor)) {
+					patchMap.get(neighborCoor).diffuseTemp(diffuseEachShare);
+					totalOutHeat += diffuseEachShare;
+				}
+			}
+		}
+		
+		// reduce self heat
+		patchMap.get(coor).diffuseTemp(-totalOutHeat);
+		
+	}
+	
+	/**
+	 * Checks whether global heat is conserved after each update
+	 * @param clone
+	 */
+	public void checkHeatEqual(HashMap<Coordinate, Patch> clone) {
+		Double originalHeat = 0.0;
+		Double updatedHeat = 0.0;
+		
+		for (Coordinate coor : patchMap.keySet()) {
+			originalHeat += clone.get(coor).getTemp();
+			updatedHeat += patchMap.get(coor).getTemp();
+		}
+	
+		if (Math.abs(originalHeat - updatedHeat) < 0.000000001) {
+			System.out.println("Heat conserved.");
+		} else {
+			System.out.println("Heat NOT conserved.");
+		}
+		
+	}
+	
+	/**
+	 * Find neighbor patches without daisy
+	 * @param coor
+	 * @return patch list
+	 */
+	public ArrayList<Patch> getEmptyNeighbors(Coordinate coor){
+		int x = coor.getX();
+		int y = coor.getY();
+		ArrayList<Patch> emptyPatch = new ArrayList<>();
+		
+		// find empty patches
 		for (int i = x - 1; i < x + 2; i++) {
 			for (int j = y - 1; j < y + 2; j++) {
 				
@@ -91,86 +185,142 @@ public class World {
 				}
 				
 				Coordinate neighCoor = new Coordinate(i, j);
-				if (patchMap.containsKey(neighCoor)) {
-					neighborNumber += 1;
-					duf += patchMap.get(neighCoor).getPreDifTemp() * Parameters.DIFFUSION_RATE / 8;
+				if (patchMap.containsKey(neighCoor) && 
+						(patchMap.get(neighCoor).getCurrentDaisy() == null)) {
+					emptyPatch.add(patchMap.get(neighCoor));
 				}
 			}
 		}
-			
-		patchMap.get(coor).updateTemp(duf, neighborNumber);
 		
+		return emptyPatch;
 	}
 	
-	public void updateOldDaisy(Coordinate coor) {
-		patchMap.get(coor).checkDaisyDead();
-	}
-	//new flower will not reproduce.
-	public void reproduceDaisy(Coordinate coor) {
-		Patch patch = patchMap.get(coor);
-		ArrayList<Patch> emptyPatch = new ArrayList<Patch>();
-		int x = coor.getX();
-		int y = coor.getY();
-		//int patchType;
-		Random rand = new Random();
+	/**
+	 * Sprount daisy to empty neighbor patches based on Netlogo model
+	 * @param patch
+	 * @param coor
+	 */
+	public void sproutDaisy(Patch patch, Coordinate coor) {
+		Double seedThreshold = patch.getSeedThreshold();
+		double reproduceProb = rand.nextDouble();
 		
-		//if ((patchType = patch.getType()) != 0)
-		if (patch.getCurrentDaisy() != null){
+		// sprount based on seedThreshold
+		if (seedThreshold > reproduceProb) {
+			ArrayList<Patch> emptyNeighbors = getEmptyNeighbors(coor);
 			
-			for (int i = x - 1; i < x + 2; i++) {
-				for (int j = y - 1; j < y + 2; j++) {
-					
-					if (i == x && j == y) {
-						continue;
-					}
-					
-					Coordinate neighCoor = new Coordinate(i, j);
-					if (patchMap.containsKey(neighCoor) && 
-							(patchMap.get(neighCoor).getCurrentDaisy() == null)) {
-						emptyPatch.add(patchMap.get(neighCoor));
-					}
-				}
-			}
-			if (emptyPatch.size() != 0) {
-				int reproduce_index = rand.nextInt(emptyPatch.size());
-				double reproduce_prob = rand.nextDouble();
-			
-				if (patch.getSeedThreshold() > reproduce_prob) {
-					//emptyPatch.get(reproduce_index).putDaisy(patchType, 0);
-					if (patch.getCurrentDaisy() instanceof BlackDaisy) {
-						emptyPatch.get(reproduce_index).setCurrentDaisy(new BlackDaisy(0));
-					}
-					else{
-						emptyPatch.get(reproduce_index).setCurrentDaisy(new WhiteDaisy(0));
-					}
+			// randomly sprount to one of the empty neighbours
+			if (emptyNeighbors.size() != 0) {
+				int sprountIndex = rand.nextInt(emptyNeighbors.size());
+				
+				if (patch.getCurrentDaisy() instanceof BlackDaisy) {
+					emptyNeighbors.get(sprountIndex).setCurrentDaisy(new BlackDaisy(0));
+				} else{
+					emptyNeighbors.get(sprountIndex).setCurrentDaisy(new WhiteDaisy(0));
 				}
 			}
 		}
 	}
 	
+	/**
+	 * Clones all the patches. This function is used for synchronized update
+	 * @return copied patches
+	 */
+	public HashMap<Coordinate, Patch> clonePatches(){
+		HashMap<Coordinate, Patch> clone = new HashMap<>();
+		for (Coordinate coor : patchMap.keySet()) {
+			clone.put(coor, new Patch(patchMap.get(coor)));
+		}
+		return clone;
+	}
+	
+	/**
+	 * Forward one tick, update status.
+	 */
 	public void updateTick() {
-		globalTemp = 0;
-		whitePop = 0;
-		blackPop = 0;
-		totalPop = 0;
-		
+		// update each pathches' local temperature
 		for (Coordinate coor : patchMap.keySet()) {
-			patchMap.get(coor).updateLocalTemp();
-			patchMap.get(coor).updateAge();
-			
+			patchMap.get(coor).updateLocalTemp();	
 		}
 		
-		for (Coordinate coor : patchMap.keySet()) {
-			updateTemp(coor);
-			reproduceDaisy(coor);
-			updateOldDaisy(coor);
+		// create a copy of patches at current state
+		HashMap<Coordinate, Patch> clone = clonePatches();
+		
+		// diffuse heat to neighbours, use clone to archieve synchronized update
+		for (Coordinate coor : clone.keySet()) {
+			diffuseTemperature(clone.get(coor), coor);
 		}
 		
+		// check whether global heat is conserved
+		checkHeatEqual(clone);
+		
+		// update daisy status, including old, dead and sprout
+		ArrayList<Coordinate> daisySet = getCoorWithDaisy();
+		while (!daisySet.isEmpty()) {
+			int daisyIndex = rand.nextInt(daisySet.size());
+			Coordinate cur = daisySet.get(daisyIndex);
+			daisySet.remove(daisyIndex);
+			Patch patch = patchMap.get(cur);
+			patch.updateAge();
+			if (patch.checkDaisyDead()) {
+				continue;
+			} else {
+				// sprount daisy based, new born daisy can not sprount in this tick
+				sproutDaisy(patch, cur);
+			}
+		}
+		
+		updateObservers();
+		this.tick += 1;
+		
+		if ( sencerio == Sencerio.RAMP_UP_RAMP_DOWN) {
+			updateLuminosity();
+		}
+		
+	}
+	
+	/**
+	 * Get a list of coordinates which have daisy on
+	 * @return coordinate list
+	 */
+	public ArrayList<Coordinate> getCoorWithDaisy(){
+		ArrayList<Coordinate> daisyCoor = new ArrayList<>();
+		for (Coordinate coor : patchMap.keySet()) {
+			if (patchMap.get(coor).getCurrentDaisy() != null) {
+				daisyCoor.add(coor);
+			}
+		}
+		return daisyCoor;
+	}
+	
+	/**
+	 * Update luminosity in rump-up and down mode based on Netlogo formula
+	 */
+	public void updateLuminosity() {
+		if (tick > 200 && tick <= 400) {
+			Parameters.LUMINOSITY += 0.005;
+		} else if (tick > 600 && tick <= 850) {
+			Parameters.LUMINOSITY -= 0.0025;
+		}
+		// preserve only four decimal
+		String roundFour = String.format("%.4f", Parameters.LUMINOSITY);
+		Parameters.LUMINOSITY = Double.parseDouble(roundFour);
+	}
+	
+	/**
+	 * Update observer status
+	 */
+	public void updateObservers() {
+		double totalTemp = 0;
+		int totalPop = 0;
+		int whitePop = 0;
+		int blackPop = 0;
+		
+		// enumerate to collect status
 		for (Coordinate coor : patchMap.keySet()) {
 			Patch patch = patchMap.get(coor);
 			double temp = patch.getTemp();
 			
-			globalTemp += temp / worldSize;
+			totalTemp += temp;
 			Daisy type = patch.getCurrentDaisy();
 			if (type instanceof WhiteDaisy) {
 				whitePop += 1;
@@ -181,24 +331,66 @@ public class World {
 			}
 		}
 		
+		this.globalTemp = totalTemp / worldSize;
+		this.whitePop = whitePop;
+		this.blackPop = blackPop;
+		this.totalPop = totalPop;
 	}
 	
+	/**
+	 * Print system status
+	 */
 	public void renderTick() {
-		// String status = String.format("Luminosity: %f, Temp: %f, Population: %d ", luminosity, globalTemp, totalPop);	
-		System.out.println(globalTemp);
-		System.out.println(totalPop);
-		System.out.println(whitePop);
-		System.out.println(blackPop);
-		System.out.println(" ");
+		String observer = String.format("Global temperature: %.4f, Total population: %d, "
+				+ "White Daisy population: %d, Black Daisy population: %d", 
+				globalTemp, totalPop, whitePop,blackPop);
+		System.out.println(observer);
 	}
 	
+	/**
+	 * Write status to csv file
+	 */
+	public void writeCsv() {
+		List<String> line =Arrays.asList(String.valueOf(tick) 
+				, String.valueOf(whitePop), String.valueOf(blackPop) 
+				, String.valueOf(totalPop), String.valueOf(globalTemp));
+		this.csv.writeLine(line);
+	}
+	
+	/**
+	 * Save all the record
+	 */
+	public void flush() {
+		this.csv.saveFile();
+    System.out.println("");
+	}
+	
+	/**
+	 * The main function takes in parameters from command line and execute experiments
+	 * @param args - name : experiment name
+	 * 			   - params: in order [START_WHITE] [START_BLACK] [ALBEDO_WHITE]
+	 * 				 [ALBEDO_BLACK] [ALBEDO_GROUND] [LUMINOSITY] [SENCERIO]
+	 */
 	public static void main(String[] args) {
-        World world = new World();
+		String name = args[0];
+		
+		// Comment line, skip
+		if (name.contains("#")) {
+			return;
+		}
+	
+    System.out.println(name);  
+		CsvHandler csv = new CsvHandler(name);
+		Parameters.setupParameters(args);
+        World world = new World(csv);
         
         for (int i = 0; i < Parameters.ROUNDS; i++) {
         	world.updateTick();
         	world.renderTick();
+        	world.writeCsv();
         }
+        
+        world.flush();
         
     }
 }
