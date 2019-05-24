@@ -30,9 +30,11 @@ public class CsvHandler {
 		try {
 			this.writer = new PrintWriter(filePath);
 			this.paramHeaders = Arrays.asList("START_WHITE", 
-										"START_BLACK ", 
+										"START_BLACK ",
+										"START_RED",
 										"ALBEDO_WHITE",
 										"ALBEDO_BLACK",
+										"ALBEDO_RED",
 										"ALBEDO_GROUND",
 										"LUMINOSITY",
 										"SENCERIO");
@@ -40,6 +42,7 @@ public class CsvHandler {
 			this.reporters = Arrays.asList("TICK",
 											"WHITE_DAISY_POPULATION",
 											"BLACK_DAISY_POPULATION",
+											"RED_DAISY_POPULATION",
 											"TOTAL_POPULATION",
 											"GLOBAL_TEMPERATURE");
 			this.writeHeaders();
@@ -54,8 +57,10 @@ public class CsvHandler {
 	public void writeHeaders() {
 		List<String> settings = Arrays.asList(String.valueOf(Parameters.START_WHITE),
 											String.valueOf(Parameters.START_BLACK),
+											String.valueOf(Parameters.START_RED),
 											String.valueOf(Parameters.ALBEDO_WHITE),
 											String.valueOf(Parameters.ALBEDO_BLACK),
+											String.valueOf(Parameters.ALBEDO_RED),
 											String.valueOf(Parameters.ALBEDO_GROUND),
 											String.valueOf(Parameters.LUMINOSITY),
 											String.valueOf(Parameters.SENCERIO));

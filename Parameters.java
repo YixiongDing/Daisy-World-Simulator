@@ -20,6 +20,8 @@ public class Parameters {
 	public static double START_WHITE = 0.2;
 	
 	public static double START_BLACK = 0.2;
+
+	public static double START_RED = 0.2;
 	
 	public static Sencerio SENCERIO = Sencerio.STABLE;
 	
@@ -41,11 +43,13 @@ public class Parameters {
 	public static void setupParameters(String[] params) {
 		START_WHITE = Double.parseDouble(params[1]);
 		START_BLACK = Double.parseDouble(params[2]);
-		ALBEDO_WHITE = Double.parseDouble(params[3]);
-		ALBEDO_BLACK = Double.parseDouble(params[4]);
-		ALBEDO_GROUND = Double.parseDouble(params[5]);
-		LUMINOSITY = Double.parseDouble(params[6]);
-		if (Integer.parseInt(params[7]) == 1) {
+		START_RED = Double.parseDouble(params[3]);
+		ALBEDO_WHITE = Double.parseDouble(params[4]);
+		ALBEDO_BLACK = Double.parseDouble(params[5]);
+		ALBEDO_RED = Double.parseDouble(params[6]);
+		ALBEDO_GROUND = Double.parseDouble(params[7]);
+		LUMINOSITY = Double.parseDouble(params[8]);
+		if (Integer.parseInt(params[9]) == 1) {
 			SENCERIO = Sencerio.STABLE;
 		} else {
 			SENCERIO = Sencerio.RAMP_UP_RAMP_DOWN;

@@ -1,1 +1,1 @@
-xargs < parameters.txt -n8 java World
+xargs < parameters.txt -n10 java World
