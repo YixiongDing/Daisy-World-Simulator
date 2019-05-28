@@ -1,3 +1,11 @@
 #EXPERIMENT_NAME START_WHITE START_BLACK ALBEDO_WHITE ALBEDO_BLACK ALBEDO_GROUND LUMINOSITY SENCERIO(1_means_stable_other_means_rumping)
-  DEFAULT.csv 0.2 0.2 0.2 0.75 0.25 0.5 0.4 0.8 1 
-  TEXT.csv 0.2 0.2 0.2 0.75 0.25 0.5 0.4 0.8 1
+  DEFAULT.csv 0.2 0.2 0.75 0.25 0.4 0.8 1 
+  Symetric.csv  0.0 0.5 0.0 0.25  0.75  0.8 1
+  Symetric2.csv 0.0 0.5 0.0 0.75  0.25  0.8 1
+  Converge_1.csv  0.0 0.5 0.0 0.25  0.35  0.8 1
+  Comparsion1.csv 0.2 0.2 0.5 0.2 0.4 0.8 1
+  Rump_Up_Down.csv  0.5 0.2 0.25  0.75  0.4 0.8 0
+  Corporation.csv 0.2 0.2 0.75  0.15  0.4 0.8 1
+  High_lumin.csv  0.2 0.2 0.75  0.15  0.4 1.4 1
+  Low_lumin.csv 0.2 0.2 0.75  0.15  0.4 0.6 1
+  

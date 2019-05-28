@@ -2,7 +2,8 @@
  * CsvHandler class for writing all experiment data into csv file.
  *
  * @author Shenglan Yu<shenglany1@student.unimelb.edu.au> - 808600
- * @author Haohua Wu<haohuaw@student.unimelb.edu.au> - 927081
+ * 		   Yixiong Ding - 671499
+ *  	   Haohua Wu - 927081
  *
  */
 
@@ -30,11 +31,9 @@ public class CsvHandler {
 		try {
 			this.writer = new PrintWriter(filePath);
 			this.paramHeaders = Arrays.asList("START_WHITE", 
-										"START_BLACK ",
-										"START_RED",
+										"START_BLACK ", 
 										"ALBEDO_WHITE",
 										"ALBEDO_BLACK",
-										"ALBEDO_RED",
 										"ALBEDO_GROUND",
 										"LUMINOSITY",
 										"SENCERIO");
@@ -42,7 +41,6 @@ public class CsvHandler {
 			this.reporters = Arrays.asList("TICK",
 											"WHITE_DAISY_POPULATION",
 											"BLACK_DAISY_POPULATION",
-											"RED_DAISY_POPULATION",
 											"TOTAL_POPULATION",
 											"GLOBAL_TEMPERATURE");
 			this.writeHeaders();
@@ -57,13 +55,11 @@ public class CsvHandler {
 	public void writeHeaders() {
 		List<String> settings = Arrays.asList(String.valueOf(Parameters.START_WHITE),
 											String.valueOf(Parameters.START_BLACK),
-											String.valueOf(Parameters.START_RED),
 											String.valueOf(Parameters.ALBEDO_WHITE),
 											String.valueOf(Parameters.ALBEDO_BLACK),
-											String.valueOf(Parameters.ALBEDO_RED),
 											String.valueOf(Parameters.ALBEDO_GROUND),
 											String.valueOf(Parameters.LUMINOSITY),
-											String.valueOf(Parameters.SENCERIO));
+											String.valueOf(Parameters.SCENARIO));
 		writeLine(this.paramHeaders);
 		writeLine(settings);
 		writeLine(this.reporters);

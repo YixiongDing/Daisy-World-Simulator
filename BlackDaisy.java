@@ -2,7 +2,8 @@
  * Black Daisy class.
  *
  * @author Shenglan Yu<shenglany1@student.unimelb.edu.au> - 808600
- * @author Haohua Wu<haohuaw@student.unimelb.edu.au> - 927081
+ *  	   Yixiong Ding - 671499
+ *  	   Haohua Wu - 927081
  *
  */
 public class BlackDaisy extends Daisy{

@@ -2,7 +2,8 @@
  * World class for wrapping all the elements in the experiment.
  *
  * @author Shenglan Yu<shenglany1@student.unimelb.edu.au> - 808600
- * @author Haohua Wu<haohuaw@student.unimelb.edu.au> - 927081
+ * 		   Yixiong Ding - 671499
+ *  	   Haohua Wu - 927081
  *
  */
 import java.util.ArrayList;
@@ -22,12 +23,11 @@ public class World {
 	private double globalTemp;
 	private int whitePop;
 	private int blackPop;
-	private int redPop;
 	private int totalPop;
 	private int xSize;
 	private int ySize;
 	private int worldSize;
-	private Sencerio sencerio;
+	private Scenario sencerio;
 	private int tick;
 	// random generator with seed
 	Random rand;
@@ -48,7 +48,7 @@ public class World {
 		ySize = Parameters.WORLD_SIZE_Y;
 		worldSize = xSize * ySize;
 		globalTemp = 0;
-		sencerio = Parameters.SENCERIO;
+		sencerio = Parameters.SCENARIO;
 		
 		// initialize all patches
 		for (int i = 0; i < xSize; i++) {
@@ -80,25 +80,24 @@ public class World {
 	public void setupDaisy() {
 		int startWhite = (int) Math.round((worldSize * Parameters.START_WHITE));
 		int startBlack = (int) Math.round((worldSize * Parameters.START_BLACK));
-		int startRed = (int) Math.round((worldSize * Parameters.START_RED));
 
 		Set<Coordinate> usedCoor = new HashSet<Coordinate>();
-
-		// create black daisy
+		
+		// create black daisy 
 		for (int j = 0; j < startBlack; j++) {
 			int new_x = rand.nextInt(xSize);
 			int new_y = rand.nextInt(ySize);
-
+			
 			// ensure daisy are born at different cells
 			while (usedCoor.contains(new Coordinate(new_x, new_y))) {
 				new_x = rand.nextInt(xSize);
 				new_y = rand.nextInt(ySize);
 			}
-
+			
 			patchMap.get(new Coordinate(new_x, new_y)).setCurrentDaisy(new BlackDaisy(1));
 			usedCoor.add(new Coordinate(new_x, new_y));
 		}
-
+		
 		// create white daisy 
 		for (int i = 0; i < startWhite; i++) {
 			int new_x = rand.nextInt(xSize);
@@ -111,20 +110,6 @@ public class World {
 			}
 	
 			patchMap.get(new Coordinate(new_x, new_y)).setCurrentDaisy(new WhiteDaisy(1));
-			usedCoor.add(new Coordinate(new_x, new_y));
-		}
-		// create red daisy
-		for (int k = 0; k < startRed; k++) {
-			int new_x = rand.nextInt(xSize);
-			int new_y = rand.nextInt(ySize);
-
-			// ensure daisy are born at different cells
-			while (usedCoor.contains(new Coordinate(new_x, new_y))) {
-				new_x = rand.nextInt(xSize);
-				new_y = rand.nextInt(ySize);
-			}
-
-			patchMap.get(new Coordinate(new_x, new_y)).setCurrentDaisy(new RedDaisy(1));
 			usedCoor.add(new Coordinate(new_x, new_y));
 		}
 	}
@@ -230,12 +215,8 @@ public class World {
 				
 				if (patch.getCurrentDaisy() instanceof BlackDaisy) {
 					emptyNeighbors.get(sprountIndex).setCurrentDaisy(new BlackDaisy(0));
-				}
-				else if(patch.getCurrentDaisy() instanceof WhiteDaisy){
+				} else{
 					emptyNeighbors.get(sprountIndex).setCurrentDaisy(new WhiteDaisy(0));
-				}
-				else{
-					emptyNeighbors.get(sprountIndex).setCurrentDaisy(new RedDaisy(0));
 				}
 			}
 		}
@@ -292,9 +273,10 @@ public class World {
 		updateObservers();
 		this.tick += 1;
 		
-		if ( sencerio == Sencerio.RAMP_UP_RAMP_DOWN) {
+		if ( sencerio == Scenario.RAMP_UP_RAMP_DOWN) {
 			updateLuminosity();
 		}
+		
 	}
 	
 	/**
@@ -333,7 +315,6 @@ public class World {
 		int totalPop = 0;
 		int whitePop = 0;
 		int blackPop = 0;
-		int redPop = 0;
 		
 		// enumerate to collect status
 		for (Coordinate coor : patchMap.keySet()) {
@@ -349,16 +330,11 @@ public class World {
 				blackPop += 1;
 				totalPop += 1;
 			}
-			else{
-				redPop += 1;
-				totalPop += 1;
-			}
 		}
 		
 		this.globalTemp = totalTemp / worldSize;
 		this.whitePop = whitePop;
 		this.blackPop = blackPop;
-		this.redPop = redPop;
 		this.totalPop = totalPop;
 	}
 	
@@ -367,8 +343,8 @@ public class World {
 	 */
 	public void renderTick() {
 		String observer = String.format("Global temperature: %.4f, Total population: %d, "
-				+ "White Daisy population: %d, Black Daisy population: %d, Red Daisy population: %d",
-				globalTemp, totalPop, whitePop,blackPop,redPop);
+				+ "White Daisy population: %d, Black Daisy population: %d", 
+				globalTemp, totalPop, whitePop,blackPop);
 		System.out.println(observer);
 	}
 	
@@ -377,8 +353,8 @@ public class World {
 	 */
 	public void writeCsv() {
 		List<String> line =Arrays.asList(String.valueOf(tick) 
-				, String.valueOf(whitePop), String.valueOf(blackPop)
-				, String.valueOf(redPop), String.valueOf(totalPop), String.valueOf(globalTemp));
+				, String.valueOf(whitePop), String.valueOf(blackPop) 
+				, String.valueOf(totalPop), String.valueOf(globalTemp));
 		this.csv.writeLine(line);
 	}
 	
@@ -387,7 +363,6 @@ public class World {
 	 */
 	public void flush() {
 		this.csv.saveFile();
-    System.out.println("");
 	}
 	
 	/**
@@ -397,19 +372,16 @@ public class World {
 	 * 				 [ALBEDO_BLACK] [ALBEDO_GROUND] [LUMINOSITY] [SENCERIO]
 	 */
 	public static void main(String[] args) {
-		for(int i = 0; i <= 9; i++){
-			System.out.println(args[i]);
-		}
 		String name = args[0];
+		String dir = "experiments/";
 		
 		// Comment line, skip
 		if (name.contains("#")) {
 			return;
 		}
-	
-    System.out.println(name);  
-		CsvHandler csv = new CsvHandler(name);
+		
 		Parameters.setupParameters(args);
+		CsvHandler csv = new CsvHandler(dir + name);
         World world = new World(csv);
         
         for (int i = 0; i < Parameters.ROUNDS; i++) {

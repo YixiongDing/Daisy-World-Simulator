@@ -2,10 +2,11 @@
  * Sencerio enum.
  *
  * @author Shenglan Yu<shenglany1@student.unimelb.edu.au> - 808600
- * TODO: FILL your name and id
+ *		   Yixiong Ding - 671499
+ *  	   Haohua Wu - 927081
  *
  */
-public enum Sencerio {
+public enum Scenario {
 	
 	RAMP_UP_RAMP_DOWN, STABLE;
 	
