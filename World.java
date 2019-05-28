@@ -27,7 +27,7 @@ public class World {
 	private int xSize;
 	private int ySize;
 	private int worldSize;
-	private Scenario scenario;
+	private Sencerio sencerio;
 	private int tick;
 	// random generator with seed
 	Random rand;
@@ -48,7 +48,7 @@ public class World {
 		ySize = Parameters.WORLD_SIZE_Y;
 		worldSize = xSize * ySize;
 		globalTemp = 0;
-		scenario = Parameters.SCENARIO;
+		sencerio = Parameters.SENCERIO;
 		
 		// initialize all patches
 		for (int i = 0; i < xSize; i++) {
@@ -174,7 +174,9 @@ public class World {
 			updatedHeat += patchMap.get(coor).getTemp();
 		}
 	
-		if (Math.abs(originalHeat - updatedHeat) >= 0.000000001) {
+		if (Math.abs(originalHeat - updatedHeat) < 0.000000001) {
+			System.out.println("Heat conserved.");
+		} else {
 			System.out.println("Heat NOT conserved.");
 		}
 		
@@ -290,7 +292,7 @@ public class World {
 		updateObservers();
 		this.tick += 1;
 		
-		if ( scenario == Scenario.RAMP_UP_RAMP_DOWN) {
+		if ( sencerio == Sencerio.RAMP_UP_RAMP_DOWN) {
 			updateLuminosity();
 		}
 	}
@@ -395,21 +397,16 @@ public class World {
 	 * 				 [ALBEDO_BLACK] [ALBEDO_GROUND] [LUMINOSITY] [SENCERIO]
 	 */
 	public static void main(String[] args) {
-    if (args.length == 0) {
-      return;
-    }
-
 		String name = args[0];
-		String dir = "experiments/";
 		
 		// Comment line, skip
 		if (name.contains("#")) {
 			return;
 		}
-		
+	
+    System.out.println(name);  
+		CsvHandler csv = new CsvHandler(name);
 		Parameters.setupParameters(args);
-		CsvHandler csv = new CsvHandler(dir + name);
-		
         World world = new World(csv);
         
         for (int i = 0; i < Parameters.ROUNDS; i++) {
