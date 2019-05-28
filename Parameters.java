@@ -2,7 +2,7 @@
  * Parameter class for setting up all the parameters for the experiment.
  *
  * @author Shenglan Yu<shenglany1@student.unimelb.edu.au> - 808600
- * TODO: FILL your name and id
+ * @author Haohua Wu<haohuaw@student.unimelb.edu.au> - 927081
  *
  */
 public class Parameters {
