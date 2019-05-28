@@ -1,45 +1,49 @@
+/**
+ * Daisy class for  handling daisy status.
+ *
+ * @author Shenglan Yu<shenglany1@student.unimelb.edu.au> - 808600
+ * @author Haohua Wu<haohuaw@student.unimelb.edu.au> - 927081
+ *
+ */
 public class Daisy {
     private int age;
-    private double alberdo;
-    private double reproducrRate;
-    private double heatValue;
-
-    public Daisy(int age, double alberdo, double reproducrRate, double heatValue){
+    private double albedo;
+    
+    // constructors
+    public Daisy(){ }
+    
+    // clone constructor
+    public Daisy(Daisy another) {
+    	this.age = another.age;
+    	this.albedo = another.albedo;
+    }
+    
+    public Daisy(int age){
         this.age = age;
-        this.alberdo = alberdo;
-        this.reproducrRate = reproducrRate;
-        this.heatValue = heatValue;
     }
 
+    public Daisy(int age, double albedo){
+        this.age = age;
+        this.albedo = albedo;
+    }
+    
+    // setter
     public void updateAge(int age){
         this.age = age;
     }
-
-    public void updateAlberdo(double alberdo){
-        this.alberdo = alberdo;
+    
+    // setter
+    public void updateAlbedo(double albedo){
+        this.albedo = albedo;
     }
 
-    public void updateReproducrRate(double reproducrRate){
-        this.reproducrRate = reproducrRate;
-    }
-
-    public void updateHeatValue(double heatValue){
-        this.heatValue = heatValue;
-    }
-
+    // getter
     public int getAge(){
         return this.age;
     }
-
-    public double getAlberdo(){
-       return this.alberdo;
-    }
-
-    public double getReproducrRate(){
-       return this.reproducrRate;
-    }
-
-    public double getHeatValue(){
-        return this.heatValue;
+    
+    // getter
+    public double getAlbedo(){
+       return this.albedo;
     }
 }
