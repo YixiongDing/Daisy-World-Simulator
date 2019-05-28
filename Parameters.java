@@ -23,7 +23,7 @@ public class Parameters {
 
 	public static double START_RED = 0.2;
 	
-	public static Sencerio SENCERIO = Sencerio.STABLE;
+	public static Scenario SCENARIO = Scenario.STABLE;
 	
 	// Below parameters are considered as fixed in every experiments
 	public static double DIFFUSION_RATE = 0.5;
@@ -50,9 +50,9 @@ public class Parameters {
 		ALBEDO_GROUND = Double.parseDouble(params[7]);
 		LUMINOSITY = Double.parseDouble(params[8]);
 		if (Integer.parseInt(params[9]) == 1) {
-			SENCERIO = Sencerio.STABLE;
+			SCENARIO = Scenario.STABLE;
 		} else {
-			SENCERIO = Sencerio.RAMP_UP_RAMP_DOWN;
+			SCENARIO = Scenario.RAMP_UP_RAMP_DOWN;
 		}
 	}
 

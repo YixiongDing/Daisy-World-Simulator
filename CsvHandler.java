@@ -63,7 +63,7 @@ public class CsvHandler {
 											String.valueOf(Parameters.ALBEDO_RED),
 											String.valueOf(Parameters.ALBEDO_GROUND),
 											String.valueOf(Parameters.LUMINOSITY),
-											String.valueOf(Parameters.SENCERIO));
+											String.valueOf(Parameters.SCENARIO));
 		writeLine(this.paramHeaders);
 		writeLine(settings);
 		writeLine(this.reporters);
